@@ -1,0 +1,608 @@
+---
+// PortCo Pulse dashboard (the Claude Code worked example).
+// A self-contained, static re-skin of a fictional private equity portfolio
+// monitoring platform (Sponsor Fund). Firm users watch a portfolio
+// of companies submit monthly KPIs against an annual plan; the app surfaces the
+// companies that are off track using a RAG status (green within 5% of plan,
+// amber 5-15%, red over 15%). Operators submit KPIs by chatting with an AI
+// assistant rather than filling forms.
+//
+// Design rules followed here:
+//  - Never hardcode colors. Every hue is a wiki design token. The app's status
+//    colors map to tokens: On Track -> var(--brand-cyan-ink); At Risk -> var(--warning);
+//    Off Track -> var(--confidential). Chrome/headers -> var(--brand-ink);
+//    accents -> var(--brand-purple). Tints are derived with color-mix.
+//  - No external fonts: Inter for body, the mono token (--font-mono) for the
+//    micro-labels, badges, and numeric readouts.
+//  - No em/en dashes anywhere. Ranges use a hyphen; prose dashes are rewritten.
+//  - Mobile-adaptable: the left icon rail becomes a horizontal tab bar under
+//    720px (nav still works), the KPI table collapses to stacked cards using
+//    data-label attributes, and multi-column layouts fall back to a single
+//    column.
+//  - Small vanilla JS only, no framework and no network. The script below
+//    switches views and is the one motion helper for all of them: a view
+//    plays its entrance when it is shown and the showcase is on screen, holds
+//    the finished state, then replays. Off screen or in a hidden tab it waits
+//    at a clean start. Views only declare what moves (CSS under .pp-enter,
+//    data-pp-count for count-ups; the chat is scripted and reports its end).
+//    Without JS, or under prefers-reduced-motion, every view is simply its
+//    final, real content.
+//  - Rules every view shares (view state, panels, status badges) live once in
+//    this file's <style> as :global() under .pp; the view header is its own
+//    component, PpViewHeader. Views keep only their own rules.
+
+import { period, firmName } from './pp-data';
+import PpDashboardView from './PpDashboardView.astro';
+import PpDataView from './PpDataView.astro';
+import PpTrackingView from './PpTrackingView.astro';
+import PpChatView from './PpChatView.astro';
+import PpSettingsView from './PpSettingsView.astro';
+---
+
+<section class="pp" data-portco aria-label="PortCo Pulse portfolio dashboard">
+  <div class="pp-shell">
+    <!-- Slim left icon rail -->
+    <nav class="pp-rail" aria-label="PortCo Pulse sections">
+      <span class="pp-rail-mark" aria-hidden="true">P</span>
+      <button type="button" class="pp-rail-btn active" data-view="dashboard" aria-label="Dashboard" aria-current="page">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.7" />
+          <rect x="14" y="3" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.7" />
+          <rect x="14" y="12" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.7" />
+          <rect x="3" y="16" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.7" />
+        </svg>
+      </button>
+      <button type="button" class="pp-rail-btn" data-view="tracking" aria-label="Tracking">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+          <path d="M4 19V5m0 14h16M8 15l3-4 3 2 4-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <button type="button" class="pp-rail-btn" data-view="data" aria-label="Data">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+          <ellipse cx="12" cy="6" rx="7" ry="3" stroke="currentColor" stroke-width="1.7" />
+          <path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" stroke="currentColor" stroke-width="1.7" />
+        </svg>
+      </button>
+      <button type="button" class="pp-rail-btn" data-view="submit" aria-label="Submit">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+          <path d="M8 9h8m-8 4h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+        </svg>
+      </button>
+      <button type="button" class="pp-rail-btn" data-view="settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7" />
+          <path d="M12 2v3m0 14v3M4.2 4.2l2.1 2.1m11.4 11.4 2.1 2.1M2 12h3m14 0h3M4.2 19.8l2.1-2.1m11.4-11.4 2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Main app column -->
+    <div class="pp-main">
+      <!-- Topbar -->
+      <div class="pp-topbar">
+        <div class="pp-wordmark">
+          <span class="pp-brand">PortCo Pulse</span>
+          <span class="pp-firm">{firmName}</span>
+        </div>
+        <div class="pp-period">
+          <span class="pp-period-label">Period</span>
+          <span class="pp-period-value">{period}</span>
+        </div>
+      </div>
+
+      <div class="pp-content">
+        <!-- Dashboard view -->
+        <PpDashboardView />
+        <!-- End dashboard view -->
+
+        <!-- Data view -->
+        <PpDataView />
+        <!-- End data view -->
+
+        <!-- Tracking view -->
+        <PpTrackingView />
+        <!-- End tracking view -->
+
+        <!-- Submit view: the scripted operator chat -->
+        <PpChatView />
+        <!-- End submit view -->
+
+        <!-- Settings view -->
+        <PpSettingsView />
+        <!-- End settings view -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Component-scoped token map: every hue derives from a wiki design token.
+     App status colors map to tokens; tints are built with color-mix. */
+  .pp {
+    --st-ontrack: var(--brand-cyan-ink);
+    --st-atrisk: var(--warning);
+    --st-offtrack: var(--confidential);
+    --chrome: var(--brand-ink);
+    --accent: var(--brand-purple);
+
+    /* Motion tokens for every view's entrance. */
+    --pp-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --pp-rise: 420ms; /* fade and lift into place */
+    --pp-grow: 700ms; /* a bar growing to its value */
+    --pp-pop: 300ms; /* a chip or badge settling */
+    --pp-flag: 1000ms; /* one highlight on what needs attention */
+    --pp-step: 70ms; /* stagger between siblings */
+
+    font-family: var(--font-sans);
+    color: var(--ink);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .pp-shell {
+    display: flex;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--bg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ---- Left icon rail ---- */
+  .pp-rail {
+    flex: 0 0 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    background: var(--chrome);
+  }
+  .pp-rail-mark {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: var(--space-3);
+  }
+  .pp-rail-btn {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+  }
+  .pp-rail-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+  .pp-rail-btn.active {
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+  }
+
+  /* ---- Main column ---- */
+  .pp-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-soft);
+    /* Hold the window at roughly the tallest (dashboard) view's height so
+       switching to the shorter tracking, data, or settings views does not
+       shrink the mockup. Shorter views stay top-aligned and simply leave
+       whitespace at the bottom. Reset to auto on mobile below.
+       Raised from 680px after the stat cards, chart panel, and alerts gained
+       real padding (var(--space-6) = 24px top + bottom each, previously an
+       undefined token that rendered as 0). The dashboard has three padded
+       blocks stacked vertically (stat-card row, chart panel, alert row), so it
+       grew by ~3 x 48px = 144px to ~824px; rounded up to 860px for headroom. */
+    min-height: 860px;
+  }
+
+  /* ---- Topbar ---- */
+  .pp-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .pp-wordmark {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+  .pp-brand {
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--chrome);
+    font-size: 1.02rem;
+  }
+  .pp-firm {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+  }
+  .pp-period {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.2;
+  }
+  .pp-period-label {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .pp-period-value {
+    font-weight: 650;
+    font-size: 0.86rem;
+    color: var(--ink);
+  }
+
+  /* ---- Content ---- */
+  .pp-content {
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- Shared by every view ----
+     Each view is its own component and Astro scopes <style> per file, so the
+     rules all views share are written once here and reach into them with
+     :global(), fenced under .pp so nothing leaks into the rest of the wiki. */
+  .pp :global(.pp-view) {
+    display: none;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .pp :global(.pp-view.active) {
+    display: flex;
+  }
+  .pp :global(.pp-panel) {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+  }
+  .pp :global(.pp-panel-head) {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--line);
+  }
+  .pp :global(.pp-panel-title) {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--brand-ink);
+  }
+  .pp :global(.pp-panel-note) {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+  }
+  /* Status badges: tints derived from the token set by the st-* modifier. */
+  .pp :global(.pp-badge) {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.03em;
+    font-weight: 500;
+    white-space: nowrap;
+    background: color-mix(in srgb, var(--c) 12%, var(--bg));
+    color: var(--c);
+    border: 1px solid color-mix(in srgb, var(--c) 34%, var(--bg));
+  }
+  .pp :global(.st-ontrack) { --c: var(--st-ontrack); }
+  .pp :global(.st-atrisk) { --c: var(--st-atrisk); }
+  .pp :global(.st-offtrack) { --c: var(--st-offtrack); }
+
+  /* ---- View entrances ----
+     The script adds .pp-enter (animations apply) and .pp-armed (held on their
+     first frame) to the active view, then removes .pp-armed once the showcase
+     is on screen. Views write their entrance under .pp-enter using the
+     keyframes below; nothing here hides content unless the script ran. */
+  .pp :global(.pp-armed),
+  .pp :global(.pp-armed *) {
+    animation-play-state: paused !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pp :global(.pp-enter *) {
+      animation: none !important;
+    }
+  }
+  @keyframes pp-rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes pp-grow-x {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes pp-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  /* A tint that swells and fades once. Set --flag-c on the element. */
+  @keyframes pp-flag {
+    0%,
+    100% {
+      background-color: transparent;
+      box-shadow: 0 0 0 var(--space-2) transparent;
+    }
+    35% {
+      background-color: color-mix(in srgb, var(--flag-c) 16%, transparent);
+      box-shadow: 0 0 0 var(--space-2) color-mix(in srgb, var(--flag-c) 16%, transparent);
+    }
+  }
+  /* A ring that pulses out once. Set --flag-c on the element. */
+  @keyframes pp-ring {
+    from {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--flag-c) 55%, transparent);
+    }
+    to {
+      box-shadow: 0 0 0 var(--space-3) transparent;
+    }
+  }
+
+  /* ---- Mobile ---- */
+  @media (max-width: 720px) {
+    /* The vertical rail becomes a horizontal tab bar at the top of the mockup,
+       so all five buttons stay visible and the JS view-switching keeps working
+       on mobile just like desktop. */
+    .pp-shell {
+      flex-direction: column;
+    }
+    /* Drop the desktop min-height when the layout stacks so mobile content
+       flows at its own height instead of leaving a large empty gap. */
+    .pp-main {
+      min-height: 0;
+    }
+    .pp-rail {
+      flex-direction: row;
+      flex-basis: auto;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+    }
+    /* Drop the "P" badge on mobile so the five tabs get the room. */
+    .pp-rail-mark {
+      display: none;
+    }
+    /* Give the active tab a subtle bottom indicator, using the same
+       rail-on-chrome rgba tint already used elsewhere on the rail. */
+    .pp-rail-btn.active {
+      box-shadow: inset 0 -2px 0 0 rgba(255, 255, 255, 0.6);
+    }
+  }
+</style>
+
+<script>
+  // View switcher plus the one motion helper for every view, run once per
+  // PortCo Pulse instance on the page. Mirrors the dependency-free island
+  // pattern used by VcmGrid.astro.
+  //
+  // The active view moves through three phases (see PP_VIEW_PHASE in pp-data):
+  //   arm  -> start state, held: .pp-enter + .pp-armed, count-ups at their final text
+  //   play -> .pp-armed removed so CSS runs, count-ups count, the chat starts
+  //   stop -> final state: classes removed, text restored (no-JS / reduced motion)
+  // It plays only while the showcase is on screen and the tab is visible;
+  // otherwise it waits armed, so it always resumes from a clean start. When a
+  // run finishes it holds the finished state (data-pp-hold, or HOLD_MS), then
+  // replays. Every timer and frame carries the run id it was started under, and
+  // stop bumps the id, so a stale step can never fire and two runs never overlap.
+  import {
+    PP_ARMED_CLASS,
+    PP_ENTER_CLASS,
+    PP_VIEW_DONE,
+    PP_VIEW_PHASE,
+    type PpViewPhase,
+    type PpViewPhaseDetail,
+  } from './pp-data';
+
+  const HOLD_MS = 4000; // finished state stays up this long before a replay
+  const KEYBOARD_RECHECK_MS = 1000; // while keyboard focus is inside, postpone the replay
+  const COUNT_MS = 800; // default count-up length; data-pp-count="<ms>" overrides
+  const ON_SCREEN_RATIO = 0.15;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-portco]').forEach((root) => {
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('.pp-rail-btn'));
+    const views = Array.from(root.querySelectorAll<HTMLElement>('.pp-view'));
+    let current = views.find((v) => v.classList.contains('active')) ?? views[0];
+    let phase: PpViewPhase = 'stop';
+    let onScreen = false;
+    let runId = 0;
+    const timers = new Set<number>();
+
+    const canPlay = () => !reducedMotion.matches && onScreen && document.visibilityState === 'visible';
+    const keyboardInside = () => {
+      const a = document.activeElement;
+      return !!a && root.contains(a) && a.matches(':focus-visible');
+    };
+
+    function later(fn: () => void, ms: number) {
+      const id = runId;
+      const t = window.setTimeout(() => {
+        timers.delete(t);
+        if (id === runId) fn();
+      }, ms);
+      timers.add(t);
+    }
+
+    function tell(view: HTMLElement, p: PpViewPhase) {
+      phase = p;
+      view.dispatchEvent(new CustomEvent<PpViewPhaseDetail>(PP_VIEW_PHASE, { detail: { phase: p } }));
+    }
+
+    // Count-ups: the element's real text is its final value; it is kept in
+    // data-pp-final and always restored.
+    const counters = (view: HTMLElement) => Array.from(view.querySelectorAll<HTMLElement>('[data-pp-count]'));
+    function restoreCounts(view: HTMLElement) {
+      counters(view).forEach((el) => {
+        if (el.dataset.ppFinal !== undefined) el.textContent = el.dataset.ppFinal;
+      });
+    }
+    function startCounts(view: HTMLElement) {
+      const id = runId;
+      counters(view).forEach((el) => {
+        const final = (el.dataset.ppFinal ??= el.textContent ?? '');
+        const match = final.match(/\d+(?:\.\d+)?/);
+        if (!match) return;
+        const target = Number(match[0]);
+        const decimals = match[0].split('.')[1]?.length ?? 0;
+        const ms = Number(el.dataset.ppCount) || COUNT_MS;
+        const t0 = performance.now();
+        const step = (now: number) => {
+          if (id !== runId) return;
+          const t = Math.min(1, (now - t0) / ms);
+          const eased = 1 - (1 - t) ** 3;
+          el.textContent = t < 1 ? final.replace(match[0], (target * eased).toFixed(decimals)) : final;
+          if (t < 1) requestAnimationFrame(step);
+        };
+        el.textContent = final.replace(match[0], (0).toFixed(decimals));
+        requestAnimationFrame(step);
+      });
+    }
+
+    function stop(view: HTMLElement) {
+      runId += 1;
+      timers.forEach((t) => window.clearTimeout(t));
+      timers.clear();
+      view.classList.remove(PP_ENTER_CLASS, PP_ARMED_CLASS);
+      restoreCounts(view);
+      tell(view, 'stop');
+    }
+
+    function arm(view: HTMLElement) {
+      stop(view);
+      if (reducedMotion.matches) return;
+      void view.offsetWidth; // let CSS animations restart from their first frame
+      view.classList.add(PP_ENTER_CLASS, PP_ARMED_CLASS);
+      tell(view, 'arm');
+    }
+
+    function play(view: HTMLElement) {
+      view.classList.remove(PP_ARMED_CLASS);
+      startCounts(view);
+      tell(view, 'play');
+      if (view.hasAttribute('data-pp-scripted')) return; // it reports PP_VIEW_DONE itself
+      const id = runId;
+      const finite = view
+        .getAnimations({ subtree: true })
+        .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity);
+      if (finite.length === 0) return; // nothing moves in this view, so nothing to replay
+      Promise.all(finite.map((a) => a.finished))
+        .then(() => {
+          if (id === runId) finished(view);
+        })
+        .catch(() => {}); // cancelled by a stop: the run id already moved on
+    }
+
+    function finished(view: HTMLElement) {
+      const replay = () => {
+        if (keyboardInside()) return later(replay, KEYBOARD_RECHECK_MS);
+        arm(view);
+        if (canPlay()) play(view);
+      };
+      later(replay, Number(view.dataset.ppHold) || HOLD_MS);
+    }
+
+    // Bring the active view in line with the conditions: play if it can,
+    // otherwise wait at a clean start (or sit still under reduced motion).
+    function sync() {
+      if (reducedMotion.matches) {
+        if (phase !== 'stop') stop(current);
+        return;
+      }
+      if (!canPlay()) {
+        if (phase !== 'arm') arm(current);
+        return;
+      }
+      if (phase === 'arm') play(current);
+      else if (phase === 'stop') {
+        arm(current);
+        play(current);
+      }
+    }
+
+    views.forEach((v) =>
+      v.addEventListener(PP_VIEW_DONE, () => {
+        if (v === current && phase === 'play') finished(v);
+      }),
+    );
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const next = views.find((v) => v.dataset.view === btn.dataset.view);
+        buttons.forEach((b) => {
+          const isActive = b === btn;
+          b.classList.toggle('active', isActive);
+          if (isActive) b.setAttribute('aria-current', 'page');
+          else b.removeAttribute('aria-current');
+        });
+        if (!next || next === current) return;
+        stop(current);
+        current.classList.remove('active');
+        current = next;
+        current.classList.add('active');
+        sync();
+      });
+    });
+
+    new IntersectionObserver(
+      ([entry]) => {
+        onScreen = entry.isIntersecting;
+        sync();
+      },
+      { threshold: ON_SCREEN_RATIO },
+    ).observe(root);
+    document.addEventListener('visibilitychange', sync);
+    reducedMotion.addEventListener('change', sync);
+    sync();
+  });
+</script>

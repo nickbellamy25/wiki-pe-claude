@@ -1,0 +1,178 @@
+---
+// Shared frame for example preview components: the browser window chrome,
+// always-visible CTA, and caption. Each variant provides its body content
+// via the default slot and keeps only its body-specific CSS (parent scoped
+// styles do not reach slotted children in Astro).
+import { withBase } from '../../utils/withBase';
+
+interface Props {
+  href?: string;
+  defaultHref: string;
+  ariaLabel: string;
+  urlLabel: string;
+  ctaText: string;
+  caption: string;
+}
+
+const {
+  href,
+  defaultHref,
+  ariaLabel,
+  urlLabel,
+  ctaText,
+  caption,
+} = Astro.props;
+
+const target = withBase(href ?? defaultHref);
+const ctaContent = `\n${ctaText}\n`;
+---
+
+<a class="pf" href={target} aria-label={ariaLabel}>
+  <div class="pf-window">
+    <div class="pf-chrome">
+      <span class="pf-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="pf-url">{urlLabel}</span>
+    </div>
+
+    <div class="pf-body" aria-hidden="true">
+      <slot />
+    </div>
+
+    <div class="pf-overlay">
+      <span class="pf-cta">{ctaContent}<span class="pf-arrow" aria-hidden="true">&rarr;</span>
+      </span>
+    </div>
+  </div>
+  <p class="pf-caption">{caption}</p>
+</a>
+
+<style>
+  .pf {
+    display: block;
+    color: inherit;
+    margin: var(--space-8) 0;
+  }
+  .pf:hover {
+    text-decoration: none;
+  }
+
+  .pf-window {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--bg);
+    box-shadow: var(--shadow-md);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .pf:hover .pf-window {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: color-mix(in srgb, var(--brand-purple) 40%, var(--line));
+  }
+
+  /* Chrome */
+  .pf-chrome {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--line);
+  }
+  .pf-dots {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .pf-dots i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--ink-muted) 30%, var(--bg));
+  }
+  .pf-url {
+    margin-inline: auto;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+  }
+
+  /* Body slot wrapper */
+  .pf-body {
+    padding: var(--space-5);
+    background:
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+  }
+
+  /* The CTA is always visible, so the reader knows the preview opens the real
+     thing. Hover or focus only adds the shade behind it. */
+  .pf-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--space-6);
+  }
+  .pf-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--chrome-bg) 72%, transparent) 100%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .pf:hover .pf-overlay::before,
+  .pf:focus-visible .pf-overlay::before {
+    opacity: 1;
+  }
+  .pf-cta {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: var(--on-dark);
+    background: var(--brand-ink);
+    border-radius: var(--radius-md);
+    padding: 0.65em 1.2em;
+    box-shadow: var(--shadow-md);
+  }
+  .pf-arrow {
+    transition: transform 0.18s ease;
+  }
+  .pf:hover .pf-arrow {
+    transform: translateX(3px);
+  }
+
+  .pf-caption {
+    margin: var(--space-3) 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.03em;
+    color: var(--ink-muted);
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pf-window,
+    .pf-overlay::before,
+    .pf-arrow {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 520px) {
+    /* On small screens the CTA sits below the preview instead of over it. */
+    .pf-overlay {
+      position: static;
+      padding: var(--space-4) 0 0;
+    }
+    .pf-overlay::before {
+      display: none;
+    }
+  }
+</style>

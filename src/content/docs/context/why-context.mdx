@@ -1,0 +1,140 @@
+---
+title: Context is everything
+description: Claude only knows what you tell it, so the quality of your output tracks the quality of your context, and the practical ways to supply it.
+section: Context
+order: 1
+---
+
+import Callout from '../../../components/Callout.astro';
+import PromptCard from '../../../components/PromptCard.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import DiagramFigure from '../../../components/diagrams/DiagramFigure.astro';
+import coreLoop from '../../../assets/diagrams/core_loop.png';
+import ClaudeWindow from '../../../components/claude-ui/ClaudeWindow.astro';
+import ClaudeComposer from '../../../components/claude-ui/ClaudeComposer.astro';
+import FileChip from '../../../components/claude-ui/FileChip.astro';
+
+There is one idea that sits underneath everything else in this guide: Claude only knows what you tell it. It has no access to your live deal, [Firm Name]'s house view, or the document open on your other screen unless you put that material in front of it. The quality of what you get back tracks, almost exactly, the quality of the context you give. Master that and the rest is technique.
+
+## Claude starts with a blank page
+
+When you open a new chat, Claude knows nothing about your work. It has broad general knowledge, but it cannot see your Project Titan data room, it does not know which sector you are assessing, and it has no idea what "the usual format" means to you. Every useful answer begins with you supplying the facts and the framing.
+
+This is liberating once you internalize it. You are not hoping Claude guesses what you meant; you are deciding what it should know. A vague question forces Claude to invent the missing context, and invented context is where confident, fluent, wrong answers come from. A well briefed question gives Claude solid ground to stand on.
+
+<Callout type="note" title="Context is the input you control">
+You cannot control how Claude was trained, but you fully control what you put in the message box. That is the single biggest lever you have over output quality. Treat every prompt as a short brief to a sharp new analyst who has read nothing yet.
+</Callout>
+
+## The core loop
+
+Good work with Claude is not a single perfect prompt. It is a short, repeatable loop that you run until the output is right. Four moves, in order, again and again.
+
+<DiagramFigure image={coreLoop} alt="The core working loop: give context, ask precisely, refine, then verify, repeated 2 to 3 times until the output is right." caption="The core loop. Most people stop after the first answer; the value shows up on the second and third turn." maxWidth={640} />
+
+- **Give context.** Attach the document, paste the figures, or state the situation. Tell Claude who it is helping and what it is working on.
+- **Ask precisely.** State the task, the constraints, and the format you want. Precision in equals precision out.
+- **Refine.** Read the first answer and push back in the same chat: expand a section, tighten the tone, challenge an assumption. The second turn is usually where the value appears.
+- **Verify.** Check every figure, name, and claim against the source before any of it reaches a deliverable. Fluent prose is not the same as correct prose.
+
+Most people stop after the first answer. The professionals run the loop two or three times, and the difference shows in the output.
+
+## Context-free versus well briefed
+
+The same underlying question produces wildly different answers depending on how much context comes with it. Compare these two openers on an identical document.
+
+<PromptCard title="Context-free (weak)">
+What do you think of this company?
+</PromptCard>
+
+Claude has no role, no task shape, no sense of what "good" looks like, and no idea what you will do with the answer. It will produce something generic and probably hedge in every direction.
+
+<PromptCard title="Well briefed (strong)">
+You are assisting a [Team Name] professional supporting a client engagement on Project Titan, a mid-market field-service software target. I have attached the management presentation.
+
+Assess it on three dimensions, in this order:
+1. Business quality (revenue model, growth, margins)
+2. The investment angle (why this could be attractive to a buyer)
+3. The three biggest risks or open questions
+
+Use short bullet points. Cite the page or figure for any number you quote, and flag anything the management presentation is vague about.
+</PromptCard>
+
+The second prompt sets a role, names the target, defines the task, fixes the format, and tells Claude to flag gaps. Same document, far more useful answer.
+
+<ComparisonTable title="What context buys you" caption="The right column is what a few extra sentences of context produces.">
+
+| With thin context | With rich context |
+| --- | --- |
+| Generic, hedged commentary | A focused view aimed at your actual decision |
+| Claude guesses the format | Output arrives in the shape you can use |
+| Invented detail fills the gaps | Claude flags gaps instead of inventing |
+| You rewrite most of it | You refine the edges, not the whole thing |
+
+</ComparisonTable>
+
+## Context is cumulative within a chat
+
+Once you have briefed Claude in a conversation, that context stays live. You do not re-attach the file or restate the situation on every turn. You simply keep going: "Now put the financials in a table," or "Rewrite the overview for a partner with thirty seconds." Each message builds on everything said so far, which is why refining is cheap and why a single well briefed chat compounds in value the longer you work in it.
+
+The flip side matters too: because context accumulates, a chat that has drifted across three unrelated tasks becomes muddled ground for the fourth. Keep one chat to one job. The [What not to do](/best-practices/what-not-to-do) page returns to this.
+
+## How to supply context
+
+If context is everything, the next question is purely practical: how do you actually get your material in front of Claude? There are three routes, and most consulting work uses the first two every day. The sections below walk through each and when to reach for it.
+
+<ComparisonTable title="Attach, paste, or connect" caption="Most consulting work lives in the first two rows. Connectors are an optional accelerator your IT team enables.">
+
+| Method | When to use it | Strengths | Watch-outs |
+| --- | --- | --- | --- |
+| **Attach a file** | A management presentation, data pack, model, or deck already saved on your machine | Reads whole documents (PDF, Word, Excel) in full; the everyday default | Wait for the file to finish attaching before you send |
+| **Paste text directly** | A few paragraphs, an email, a table, or notes with no file | Fast; no upload step; good for snippets | Long pastes get unwieldy; a file is cleaner past a page |
+| **Connect a live source** | A large or frequently updated library (for example Google Drive) | Pulls live, large sources without re-uploading | Must be enabled by IT |
+
+</ComparisonTable>
+
+### Attach a file
+
+Attaching is the workhorse. Claude reads the entire document, so a sixty-page management presentation or a multi-tab Excel model is no problem. Click the plus button in the message box, choose **Upload from computer**, wait for the file to finish attaching, then ask your question. You can attach several files to one message, which is how you ask a single question across a whole set of documents.
+
+<ClaudeWindow caption="Attaching is the everyday route: the plus opens the menu, the file sits above your text.">
+  <div style={{ padding: '20px 12px 28px' }}>
+    <ClaudeComposer
+      menu={true}
+      value="Across these two files, where does the model's revenue assumption differ from the management presentation's narrative?"
+    >
+      <FileChip slot="files" name="Project_Titan_Mgmt_Presentation.pdf" kind="pdf" meta="62 pages" />
+      <FileChip slot="files" name="Titan_financials.xlsx" kind="xls" />
+    </ClaudeComposer>
+  </div>
+</ClaudeWindow>
+
+### Paste text directly
+
+Sometimes there is no file, just a chunk of text: a paragraph from an email, a short table, a few lines of management commentary. Paste it straight into the message box and tell Claude what to do with it. This is quicker than saving a file first, and it is ideal when the context is small. Past roughly a page, an attached file reads more cleanly and is easier to reference later.
+
+### Connect a live source
+
+Connectors let Claude reach an external system, such as a shared drive, without you downloading and re-uploading files by hand. They shine when the source is large or changes often. One thing to know up front: a connector has to be **switched on by your IT or workspace administrator** before it appears. Connectors are an accelerator, not a requirement; the [Connectors](/power-features/connectors) page covers them in full.
+
+
+## Asking across several documents
+
+The real power of attaching is the cross-document question. Give Claude two or three files at once and ask it to reconcile, compare, or find the gaps between them.
+
+<PromptCard title="Reconcile a model against the narrative">
+You are assisting a [Team Name] professional on Project Titan. I have attached the management presentation and the financial model.
+
+Compare the two and tell me:
+1. Where the model's growth and margin assumptions line up with the management presentation's narrative
+2. Where they diverge, with the figure and the source for each side
+3. The questions these differences raise for management
+
+Use a short table for the comparison. If a number appears in one file but not the other, say so rather than estimating it.
+</PromptCard>
+
+That single prompt does work that would otherwise mean flipping between two documents line by line, and it tells Claude to flag mismatches instead of papering over them.
+
+## The takeaway
+
+Claude is a fast, capable partner, but it is only ever as good as the context you give it and only as trustworthy as your verification. Hold those two ends, rich context going in and disciplined checking coming out, and the loop in between does the work. In practice you will attach files most of the time, lean on multi-file questions to do cross-document work, and reach for connectors only once IT has switched them on.

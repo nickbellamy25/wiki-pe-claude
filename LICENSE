@@ -1,0 +1,9 @@
+Copyright (c) 2026 [Copyright Holder]. All rights reserved.
+
+INTERNAL USE ONLY. This repository and the site built from it are proprietary to
+[Copyright Holder] and are provided for internal [Firm Name] use. No license is granted to copy,
+modify, distribute or publish any part of it outside [Firm Name] without written
+permission.
+
+Third-party packages in node_modules and bundled fonts (Open Sans, Open Sans
+Condensed, JetBrains Mono) remain under their own licenses.

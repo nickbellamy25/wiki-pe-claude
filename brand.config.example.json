@@ -1,0 +1,79 @@
+{
+  "firmName": "Example Firm",
+  "teamName": "Example Team",
+  "functionName": "Example Function",
+  "copyrightHolder": "Example Firm LLC",
+  "copyrightNotice": "Example Firm. All rights reserved.",
+  "governanceLink": null,
+  "logo": {
+    "light": "logo/logo-light.svg",
+    "dark": "logo/logo-dark.svg",
+    "alt": "Example Firm",
+    "width": 70,
+    "height": 28
+  },
+  "favicons": [
+    {
+      "rel": "icon",
+      "sizes": "16x16",
+      "file": "favicons/favicon-16x16.png"
+    },
+    {
+      "rel": "icon",
+      "sizes": "32x32",
+      "file": "favicons/favicon-32x32.png"
+    },
+    {
+      "rel": "apple-touch-icon",
+      "sizes": "180x180",
+      "file": "favicons/apple-touch-icon.png"
+    }
+  ],
+  "socialImage": "social/share.png",
+  "themeColor": "#1f2933",
+  "fonts": {
+    "sans": "Example Sans",
+    "display": "Example Display",
+    "mono": "Example Mono",
+    "fallbackStack": "system-ui, -apple-system, 'Segoe UI', Arial, sans-serif",
+    "monoFallbackStack": "ui-monospace, 'SF Mono', Menlo, Consolas, monospace",
+    "faces": [
+      {
+        "family": "Example Sans",
+        "file": "fonts/example-sans-400.woff2",
+        "weight": 400,
+        "style": "normal"
+      },
+      {
+        "family": "Example Sans",
+        "file": "fonts/example-sans-700.woff2",
+        "weight": 700,
+        "style": "normal"
+      },
+      {
+        "family": "Example Display",
+        "file": "fonts/example-display-700.woff2",
+        "weight": 700,
+        "style": "normal"
+      },
+      {
+        "family": "Example Mono",
+        "file": "fonts/example-mono-400.woff2",
+        "weight": 400,
+        "style": "normal"
+      }
+    ]
+  },
+  "palette": {
+    "headerOverrides": {
+      "--chrome-bg": "#ffffff",
+      "--chrome-line": "var(--line)",
+      "--chrome-fill": "var(--bg-soft)",
+      "--on-dark": "#1f2933",
+      "--on-dark-muted": "#52606d"
+    },
+    "footerOverrides": {
+      "--brand-purple": "var(--brand-cyan)"
+    }
+  }
+}

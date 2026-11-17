@@ -1,0 +1,182 @@
+---
+// Data (KPI table) view for the PortCo Pulse showcase.
+import { kpiRows, kpiCompany } from './pp-data';
+import PpViewHeader from './PpViewHeader.astro';
+---
+
+<div class="pp-view" data-view="data">
+  <PpViewHeader eyebrow="Company Analytics" title={kpiCompany} />
+
+  <!-- Company analytics KPI table -->
+  <div class="pp-panel">
+    <div class="pp-panel-head">
+      <h4 class="pp-panel-title">Company Analytics</h4>
+      <span class="pp-panel-note">{kpiCompany}</span>
+    </div>
+    <div class="pp-table-wrap">
+      <table class="pp-table">
+        <thead>
+          <tr>
+            <th>KPI</th>
+            <th>Actual</th>
+            <th>Plan</th>
+            <th>Var %</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            kpiRows.map((r, i) => (
+              <tr style={`--i:${i}`}>
+                <td class="pp-td-kpi" data-label="KPI">{r.kpi}</td>
+                <td class="pp-td-num" data-label="Actual">{r.actual}</td>
+                <td class="pp-td-num" data-label="Plan">{r.plan}</td>
+                <td class="pp-td-num" data-label="Var %">{r.variance}</td>
+                <td data-label="Status">
+                  <span class:list={['pp-badge', `st-${r.status}`]}>{r.statusLabel}</span>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ---- KPI table ---- */
+  .pp-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+  }
+  .pp-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 480px;
+  }
+  .pp-table thead th {
+    background: var(--brand-ink);
+    color: var(--on-dark);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    text-align: left;
+    padding: 9px 13px;
+    white-space: nowrap;
+  }
+  .pp-table tbody tr {
+    border-bottom: 1px solid var(--line);
+  }
+  .pp-table tbody tr:last-child {
+    border-bottom: none;
+  }
+  .pp-table tbody tr:hover {
+    background: var(--bg-soft);
+  }
+  .pp-table td {
+    padding: 10px 13px;
+    vertical-align: middle;
+    color: var(--ink-muted);
+    font-size: 0.82rem;
+  }
+  .pp-td-kpi {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .pp-td-num {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink);
+  }
+
+  /* ---- Mobile: KPI table collapses to stacked cards ---- */
+  @media (max-width: 720px) {
+    .pp-table-wrap {
+      overflow-x: visible;
+      border: none;
+      border-radius: 0;
+    }
+    .pp-table {
+      min-width: 0;
+    }
+    .pp-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .pp-table,
+    .pp-table tbody,
+    .pp-table tr,
+    .pp-table td {
+      display: block;
+      width: 100%;
+    }
+    .pp-table tr {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      padding: var(--space-4);
+      margin-bottom: var(--space-3);
+      box-shadow: var(--shadow-xs);
+    }
+    .pp-table tbody tr:hover {
+      background: var(--bg);
+    }
+    .pp-table td {
+      padding: 5px 0;
+      display: grid;
+      grid-template-columns: 40% 1fr;
+      gap: var(--space-3);
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
+    .pp-table td:last-child {
+      border-bottom: none;
+    }
+    .pp-table td::before {
+      content: attr(data-label);
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+  }
+
+  /* ---- Entrance (runs only while the showcase helper sets .pp-enter) ----
+     Each KPI row arrives with its actual and plan, and the RAG badges settle
+     last, so the reader's eye ends on variance against plan. Anything not On
+     Track gets one ring. */
+  .pp-view {
+    --t-badges: 650ms;
+    --t-flag: 1300ms;
+  }
+  .pp-enter .pp-table tbody td {
+    animation: pp-rise var(--pp-rise) var(--pp-ease) both;
+    animation-delay: calc(var(--i) * var(--pp-step));
+  }
+  .pp-enter .pp-table .pp-badge {
+    animation: pp-pop var(--pp-pop) var(--pp-ease) both;
+    animation-delay: calc(var(--t-badges) + var(--i) * var(--pp-step));
+  }
+  .pp-enter .pp-table .pp-badge.st-atrisk,
+  .pp-enter .pp-table .pp-badge.st-offtrack {
+    --flag-c: var(--c);
+    animation:
+      pp-pop var(--pp-pop) var(--pp-ease) both,
+      pp-ring var(--pp-flag) ease-out;
+    animation-delay:
+      calc(var(--t-badges) + var(--i) * var(--pp-step)),
+      var(--t-flag);
+  }
+</style>

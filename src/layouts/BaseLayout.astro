@@ -1,0 +1,70 @@
+---
+import '../styles/global.css';
+import { brand } from '../config/brand';
+import { withBase } from '../utils/withBase';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = `Claude.ai and Claude Code for ${brand.teamName}: from basics to confident daily use.`,
+} = Astro.props;
+
+const SITE_NAME = 'Claude for Private Equity';
+const isHome = title === 'Home';
+const fullTitle = isHome ? SITE_NAME : `${title} · Claude for PE`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Internal use only: never indexed (see the footer classification). -->
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={isHome ? 'website' : 'article'} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta name="twitter:card" content={brand.socialImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <!-- Paired with --chrome-bg in global.css (a meta tag cannot read a CSS variable). Change both together. -->
+    <meta name="theme-color" content={brand.themeColor} />
+    {brand.socialImage && <meta property="og:image" content={withBase('/' + brand.socialImage)} />}
+    {brand.favicons.map((f) => <link rel={f.rel} sizes={f.sizes} href={withBase('/' + f.href)} />)}
+      </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <slot />
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: 16px;
+    top: -100px; /* fully off-screen until focused */
+    z-index: 1000;
+    background: var(--brand-ink);
+    color: var(--on-dark);
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    transition: top 0.18s ease;
+  }
+  .skip-link:focus {
+    top: 16px;
+    text-decoration: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skip-link {
+      transition: none;
+    }
+  }
+</style>

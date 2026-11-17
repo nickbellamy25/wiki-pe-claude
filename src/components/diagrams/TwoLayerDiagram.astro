@@ -1,0 +1,129 @@
+---
+// TwoLayerDiagram: the two layers of Projects, built in HTML so it follows the
+// wiki tokens and stays crisp at any size. Replaces the old PNG.
+---
+
+<div class="tl" role="group" aria-label="Two layers of Projects. Permanent, shared reusable function projects sit above many temporary, siloed deal projects, one per live engagement.">
+  <section class="tl-layer tl-top">
+    <p class="tl-tag">Permanent and shared</p>
+    <h3 class="tl-title">Reusable function projects</h3>
+    <p class="tl-sub">Your standing method, persistent and shared across the team.</p>
+    <ul class="tl-cards">
+      <li>Market assessment</li>
+      <li>Market research</li>
+      <li>Benchmarking</li>
+    </ul>
+  </section>
+
+  <div class="tl-between" aria-hidden="true">
+    <span>The method stays.</span>
+    <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><path d="M10 2v22m0 0-7-7m7 7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    <span>The engagements change.</span>
+  </div>
+
+  <section class="tl-layer tl-bottom">
+    <p class="tl-tag">Temporary and siloed</p>
+    <h3 class="tl-title">Deal projects</h3>
+    <p class="tl-sub">One per live engagement, isolated and confidential. Closes when the engagement ends.</p>
+    <ul class="tl-cards tl-cards-dashed">
+      <li>Engagement A</li>
+      <li>Engagement B</li>
+      <li>Engagement C</li>
+      <li class="tl-new">and each new engagement</li>
+    </ul>
+    <p class="tl-wall">Walled off from each other</p>
+  </section>
+</div>
+
+<style>
+  .tl {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    text-align: left;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .tl-layer {
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-md);
+  }
+  .tl-top {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+  }
+  .tl-bottom {
+    background: var(--bg);
+    border: 2px dashed var(--brand-purple);
+  }
+  .tl-tag {
+    margin: 0 0 var(--space-2);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brand-ink);
+  }
+  .tl-title {
+    margin: 0 0 var(--space-1);
+    font-size: 1.35rem;
+  }
+  .tl-sub {
+    margin: 0 0 var(--space-4);
+    font-size: 0.92rem;
+    color: var(--ink-muted);
+  }
+  .tl-cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: var(--space-3);
+  }
+  .tl-cards li {
+    margin: 0;
+    padding: var(--space-4) var(--space-3);
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-xs);
+  }
+  .tl-cards-dashed li {
+    box-shadow: none;
+    border-color: var(--brand-purple);
+  }
+  .tl-cards-dashed li.tl-new {
+    border-style: dashed;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  .tl-cards li::marker {
+    content: none;
+  }
+  .tl-between {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+  }
+  .tl-between svg {
+    color: var(--brand-ink);
+  }
+  .tl-wall {
+    margin: var(--space-4) 0 0;
+    padding-top: var(--space-3);
+    border-top: 2px solid var(--brand-purple);
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brand-ink);
+  }
+</style>

@@ -1,0 +1,214 @@
+---
+import type { MarkdownHeading } from 'astro';
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Sidebar from '../components/Sidebar.astro';
+import PrevNext from '../components/PrevNext.astro';
+import Footer from '../components/Footer.astro';
+import { trackForSlug, navForTrack, flatNavForTrack, TRACKS, trackPositions, trackStepCount, sectionLabelForSlug } from '../config/nav';
+
+interface Props {
+  title: string;
+  description?: string;
+  section: string;
+  slug: string;
+  headings: MarkdownHeading[];
+}
+const { title, description, section, slug, headings } = Astro.props;
+
+// Resolve which track this page belongs to, then scope the sidebar, prev/next,
+// and numbering to that track only.
+const track = trackForSlug(slug);
+const sections = navForTrack(track);
+const flat = flatNavForTrack(track);
+const trackName = TRACKS[track].name;
+
+// Shared position labels from nav.ts (numbered spine + lettered optional).
+const pos = trackPositions(track).get(slug) ?? null;
+const stepCount = trackStepCount(track);
+
+// Section label: derive from nav.ts (single source of truth) so the eyebrow
+// matches the sidebar even when frontmatter has a stale value. Fall back to
+// the frontmatter `section` prop when the slug is not in the nav.
+const navSection = sectionLabelForSlug(track, slug);
+const resolvedSection = navSection ?? section;
+---
+
+<BaseLayout title={title} description={description}>
+  <Header />
+
+  <div class="doc-shell">
+    <!-- Mobile sidebar toggle -->
+    <button type="button" class="mobile-nav-toggle" id="mobile-nav-toggle" aria-expanded="false" aria-controls="mobile-sidebar">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+        <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      <span>{resolvedSection}</span>
+    </button>
+
+    <div class="doc-grid container">
+      <div class="doc-sidebar" id="mobile-sidebar">
+        <Sidebar currentSlug={slug} sections={sections} track={track} />
+      </div>
+
+      <main class="doc-main" id="main">
+        <article
+          class="doc-article"
+          data-pagefind-body
+          data-pagefind-filter={`Track:${trackName}`}
+          data-pagefind-meta={`track:${trackName}`}
+        >
+          <header class="doc-header" data-reveal>
+            <p class="doc-eyebrow">
+              {resolvedSection}{pos ? (pos.optional ? <span class="doc-pos"> · Optional</span> : <span class="doc-pos"> · {pos.step} of {stepCount}</span>) : null}
+            </p>
+            <h1 data-pagefind-meta="title">{title}</h1>
+            {description && <p class="doc-lede">{description}</p>}
+          </header>
+
+          <div class="prose">
+            <slot />
+          </div>
+
+          <PrevNext currentSlug={slug} flatItems={flat} />
+        </article>
+      </main>
+    </div>
+  </div>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .doc-shell {
+    position: relative;
+  }
+  .doc-grid {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) minmax(0, var(--measure));
+    justify-content: center; /* sidebar and article centered together, a fixed gap apart */
+    gap: var(--space-12);
+  }
+  .doc-main {
+    min-width: 0;
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-16);
+  }
+  .doc-article {
+    max-width: var(--measure);
+  }
+
+  .doc-header {
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--line);
+  }
+  .doc-eyebrow {
+    margin: 0 0 var(--space-3);
+    font-size: 0.78rem;
+    font-weight: 650;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brand-ink);
+  }
+  .doc-pos {
+    color: var(--ink-muted);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .doc-lede {
+    margin: var(--space-4) 0 0;
+    font-size: 1.18rem;
+    line-height: 1.6;
+    color: var(--ink-muted);
+  }
+
+  /* Prose rhythm */
+  .prose :global(h2) {
+    scroll-margin-top: calc(var(--header-h) + 16px);
+  }
+  .prose :global(h3) {
+    scroll-margin-top: calc(var(--header-h) + 16px);
+  }
+  .prose :global(:first-child) {
+    margin-top: 0;
+  }
+
+  /* Mobile sidebar */
+  .mobile-nav-toggle {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin: var(--space-4) var(--space-4) 0;
+    padding: 9px 14px;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+
+  .doc-footer {
+    border-top: 1px solid var(--line);
+    background: var(--bg-soft);
+    padding: var(--space-8) 0;
+  }
+  .doc-footer-inner {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+  }
+  .doc-footer-inner strong {
+    color: var(--ink);
+  }
+
+  @media (max-width: 1080px) {
+    .doc-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-8);
+    }
+    .mobile-nav-toggle {
+      display: inline-flex;
+    }
+    .doc-sidebar {
+      display: none;
+      width: 100%;
+    }
+    .doc-sidebar.open {
+      display: block;
+      padding-inline: var(--space-4);
+    }
+    .doc-sidebar.open :global(.sidebar) {
+      display: block;
+      width: 100%;
+    }
+    .doc-sidebar.open :global(.sidebar-scroll) {
+      position: static;
+      max-height: none;
+      padding-right: 0;
+    }
+    .doc-main {
+      padding-top: var(--space-6);
+    }
+  }
+</style>
+
+<script>
+  // Mobile sidebar toggle
+  const toggle = document.getElementById('mobile-nav-toggle');
+  const sidebar = document.getElementById('mobile-sidebar');
+  toggle?.addEventListener('click', () => {
+    const open = sidebar?.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+</script>
+
+<script>
+  import '../scripts/motion.ts';
+</script>

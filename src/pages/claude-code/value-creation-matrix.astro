@@ -1,0 +1,22 @@
+---
+// Standalone full-width view of the AI Value Creation Matrix: the PE use case
+// library as a lever x phase grid, with the strategic summary below it.
+// PE use cases is its guide page and links here through MatrixPreview.
+import DeliverableLayout from '../../layouts/DeliverableLayout.astro';
+import VcmGrid from '../../components/examples/VcmGrid.astro';
+import VcmFootnote from '../../components/examples/VcmFootnote.astro';
+
+const walkthroughHref = '/claude-code/example-value-creation';
+---
+
+<DeliverableLayout
+  title="AI Value Creation Matrix"
+  description="The PE use case library: what is possible to create with Claude Code, laid out by value lever and hold phase."
+  walkthroughHref={walkthroughHref}
+  walkthroughLabel="PE use cases"
+  subtitle="The PE use case library: what is possible to create with Claude Code across the five value levers a sponsor pulls during a hold. Each use case sits under the lever it pulls and the hold phase it fits. Select one for its detail, or filter by fund tier and service line."
+>
+  <VcmGrid>
+    <VcmFootnote />
+  </VcmGrid>
+</DeliverableLayout>

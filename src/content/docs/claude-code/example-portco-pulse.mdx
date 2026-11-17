@@ -1,0 +1,38 @@
+---
+title: "PortCo Pulse dashboard"
+description: "A worked example of a portfolio-monitoring dashboard you could assemble with Claude Code: KPI tracking, plan-vs-actual variance, and automated off-track alerts across a private equity portfolio."
+section: Worked example
+order: 2
+---
+
+import CardGrid from '../../../components/CardGrid.astro';
+import Card from '../../../components/Card.astro';
+import PortcoPulsePreview from '../../../components/examples/PortcoPulsePreview.astro';
+
+This page is a supporting example for [PE use cases](/claude-code/example-value-creation): the KPI monitoring and alerting workflow behind the library's one use case marked Built, built out end to end with Claude Code as a live dashboard. The point is not this one dashboard, but the pattern: turning scattered monthly KPI reporting, a spreadsheet from each company, a plan buried in a deck, into a single view that shows performance and flags what is off track.
+
+The finished version is a full page of its own. The preview below links straight to it.
+
+<PortcoPulsePreview />
+
+## What you are looking at
+
+The dashboard follows a fictional sponsor fund and eight portfolio companies that submit monthly KPIs against an FY2026 plan. Each figure is compared to plan and given a RAG status: green when the company is within 5% of plan, amber when it is 5-15% off, and red when it is more than 15% off. The tracked KPIs are revenue, gross margin, EBITDA, headcount, churn rate, and NPS.
+
+The top of the dashboard shows three stat cards: how many companies are in the portfolio, how many submissions are still pending, and how many alerts are open. Below that, a portfolio bar chart ranks companies by latest-period revenue, and an off-track and at-risk section pulls out the two companies that need attention. A company analytics table then breaks one company down KPI by KPI, and a submission tracking grid shows which reports each company has filed for the period.
+
+Operators at each portfolio company do not fill in forms. They report KPIs by chatting with an AI assistant, which reads the numbers back, checks them against the plan, and files the submission. On the full dashboard, the Submit view in the left rail plays an example of one operator reporting a month's KPIs this way. That structure is the hard part, and it is exactly the kind of work Claude Code is good at. You bring the plan and the judgment; Claude does the patient job of wiring the pieces into one consistent view.
+
+## See the finished deliverable
+
+<PortcoPulsePreview />
+
+## What to reuse
+
+The value here is the workflow, not this one dashboard. Any time you have scattered reporting that would be more useful as a single, comparable view with clear thresholds, the same approach applies.
+
+<CardGrid columns={2}>
+  <Card title="PE use cases" href="/claude-code/example-value-creation" eyebrow="What you can build">
+    A library of what Claude Code makes possible for private equity value creation, grouped by value lever.
+  </Card>
+</CardGrid>

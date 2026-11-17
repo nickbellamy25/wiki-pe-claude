@@ -1,0 +1,278 @@
+---
+// TwoPathsDiagram: one input, two ways to work, one verified output. Built in
+// HTML and inline SVG so it follows the wiki tokens (brand palette) and stays
+// sharp at any size. Replaces the old home-two-paths PNG.
+---
+
+<div class="tp-wrap">
+<div class="tp" role="group" aria-label="One Claude, two ways to work. Your engagement work (management presentations, financial models, workshop transcripts, data room exports) flows into two paths: claude.ai in the browser for questions, analysis and drafting, and Claude Code in your files for hands-on work. Both lead to confident, verified output.">
+  <!-- Input -->
+  <section class="tp-card tp-input">
+    <span class="tp-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
+    </span>
+    <h3 class="tp-title">Your engagement work</h3>
+    <ul class="tp-tiles">
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5M9 13h6M9 17h6" /></svg>
+        <span>Management presentations</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M4 10h16M10 4v16" /></svg>
+        <span>Financial models</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" /><path d="M8 9h8M8 12h5" /></svg>
+        <span>Workshop transcripts</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3" /><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" /></svg>
+        <span>Data room exports</span>
+      </li>
+    </ul>
+  </section>
+
+  <div class="tp-link" aria-hidden="true">
+    <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14h24m0 0-8-8m8 8-8 8" /></svg>
+  </div>
+
+  <!-- Two paths -->
+  <div class="tp-paths">
+    <section class="tp-card tp-path">
+      <p class="tp-badge">Core track, start here</p>
+      <div class="tp-path-head">
+        <span class="tp-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" /></svg>
+        </span>
+        <div>
+          <h3 class="tp-title">claude.ai</h3>
+          <p class="tp-line">Chat in your browser</p>
+        </div>
+      </div>
+      <p class="tp-best">Best for questions, analysis, drafting</p>
+    </section>
+    <section class="tp-card tp-path">
+      <p class="tp-badge tp-badge-alt">Advanced track, add next</p>
+      <div class="tp-path-head">
+        <span class="tp-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="m10 9-3 3 3 3m4-6 3 3-3 3" /></svg>
+        </span>
+        <div>
+          <h3 class="tp-title">Claude Code</h3>
+          <p class="tp-line">Works in your files on your computer</p>
+        </div>
+      </div>
+      <p class="tp-best">Best for hands-on, file-heavy work</p>
+    </section>
+  </div>
+
+  <div class="tp-link" aria-hidden="true">
+    <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14h24m0 0-8-8m8 8-8 8" /></svg>
+  </div>
+
+  <!-- Output -->
+  <section class="tp-card tp-output">
+    <span class="tp-icon tp-icon-solid" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.4 3 8.2 7 9.5 4-1.3 7-5.1 7-9.5V6z" /><path d="m9 12 2 2 4-4" /></svg>
+    </span>
+    <h3 class="tp-title">Confident, verified output</h3>
+    <p class="tp-line">Confidential by design</p>
+    <ul class="tp-checks">
+      <li>Accurate and sourced</li>
+      <li>Private and secure</li>
+      <li>You stay in control</li>
+    </ul>
+  </section>
+</div>
+</div>
+
+<style>
+  .tp-wrap {
+    container-type: inline-size;
+  }
+  .tp {
+    display: grid;
+    grid-template-columns: 1fr 40px 1.3fr 40px 1fr;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    text-align: left;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .tp-card {
+    padding: var(--space-4);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  .tp-input,
+  .tp-output {
+    background: var(--bg-soft);
+  }
+  .tp-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 40px;
+    height: 40px;
+    margin-bottom: var(--space-2);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--brand-ink) 10%, var(--bg));
+    color: var(--brand-ink);
+  }
+  .tp-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+  .tp-icon-solid {
+    background: var(--brand-ink);
+    color: #ffffff;
+  }
+  .tp-title {
+    margin: 0 0 var(--space-1);
+    font-size: 1.05rem;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+  .tp-line {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--ink-muted);
+  }
+
+  /* Input tiles */
+  .tp-tiles {
+    list-style: none;
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+  .tp-tiles li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 6px 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.25;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+  .tp-tiles li::marker {
+    content: none;
+  }
+  .tp-tiles svg {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    color: var(--brand-ink);
+  }
+
+  /* Links between columns */
+  .tp-link {
+    display: flex;
+    justify-content: center;
+    color: var(--brand-ink);
+  }
+  .tp-link svg {
+    width: 36px;
+    height: 36px;
+    stroke-width: 2.5;
+  }
+
+  /* Paths */
+  .tp-paths {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .tp-path {
+    border: 2px solid var(--brand-purple);
+  }
+  .tp-badge {
+    display: inline-block;
+    margin: 0 0 var(--space-2);
+    padding: 2px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #ffffff;
+    background: var(--brand-ink);
+    border-radius: 999px;
+  }
+  .tp-badge-alt {
+    background: var(--ink);
+  }
+  .tp-path-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .tp-path-head .tp-icon {
+    margin-bottom: 0;
+  }
+  .tp-best {
+    margin: var(--space-3) 0 0;
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--line);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--brand-ink);
+  }
+
+  /* Output */
+  .tp-checks {
+    list-style: none;
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+  .tp-checks li {
+    position: relative;
+    margin: 0;
+    padding-left: 22px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .tp-checks li::marker {
+    content: none;
+  }
+  .tp-checks li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.2em;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--brand-ink);
+  }
+  .tp-checks li::after {
+    content: '';
+    position: absolute;
+    left: 4.5px;
+    top: calc(0.2em + 3px);
+    width: 4px;
+    height: 7px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) scale(0.8);
+  }
+
+  /* Stack on narrow containers, arrows point down */
+  @container (max-width: 640px) {
+    .tp {
+      grid-template-columns: 1fr;
+    }
+    .tp-link svg {
+      transform: rotate(90deg);
+    }
+  }
+</style>

@@ -1,0 +1,174 @@
+---
+// A miniature of the AI Value Creation Matrix, framed as a browser window, that
+// links through to the full page. It is drawn from the real data (vcm-data.ts),
+// so the shape it shows, which lever x phase cells hold how many use cases and
+// which one is built, always matches the page it opens. Pure CSS, no
+// screenshot; lever colors and badges come from vcm-shared.css.
+import PreviewFrame from './PreviewFrame.astro';
+import { levers, phaseMeta } from './vcm-data';
+import './vcm-shared.css';
+
+interface Props {
+  href?: string;
+}
+const { href } = Astro.props;
+
+const phases = Object.keys(phaseMeta);
+const total = levers.reduce((n, l) => n + l.rows.length, 0);
+// Same rule as VcmGrid: a High PortCo Pulse fit is the use case shown built.
+const BUILT_FIT = 'High';
+---
+
+<PreviewFrame
+  href={href}
+  defaultHref="/claude-code/value-creation-matrix"
+  ariaLabel="Open the AI Value Creation Matrix, the full PE use case library"
+  urlLabel="claude · ai-value-creation-matrix"
+  ctaText="Open the matrix"
+  caption="Interactive · Every use case by value lever and hold phase. Select one for its detail."
+>
+      <div class="vcm mp">
+        <div class="mp-top">
+          <span class="mp-chip mp-chip-on">All tiers</span>
+          <span class="mp-chip">Mid-Market</span>
+          <span class="mp-chip">Large-Cap</span>
+          <span class="mp-count">{total} use cases</span>
+        </div>
+
+        <div class="mp-grid">
+          <span />
+          {phases.map((p) => <span class:list={['badge', 'mp-phase', phaseMeta[p].cls]}>{phaseMeta[p].label}</span>)}
+          {
+            levers.map((lever) => (
+              <>
+                <span class="mp-lever">
+                  <span class:list={['vcm-dot', `dot-${lever.key}`]} />
+                  {lever.title}
+                </span>
+                {phases.map((p) => (
+                  <span class="mp-cell">
+                    {lever.rows
+                      .filter((r) => r.phase === p)
+                      .map((r) => (
+                        <i class:list={['mp-bar', `lv-${lever.key}`, { 'is-built': r.fit === BUILT_FIT }]} />
+                      ))}
+                  </span>
+                ))}
+              </>
+            ))
+          }
+        </div>
+      </div>
+</PreviewFrame>
+
+<style>
+  /* Body-specific styles for the matrix preview. Frame, chrome, overlay, CTA,
+     caption, hover states, and responsive breakpoints live in PreviewFrame. */
+  .mp {
+    container: mp / inline-size;
+  }
+  .mp-top {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: var(--space-3);
+  }
+  .mp-chip {
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 2px 9px;
+  }
+  .mp-chip-on {
+    background: var(--brand-ink);
+    border-color: var(--brand-ink);
+    color: var(--bg);
+    font-weight: 600;
+  }
+  .mp-count {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--ink-muted);
+  }
+
+  .mp-grid {
+    display: grid;
+    grid-template-columns: minmax(6.5rem, 0.8fr) repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .mp-grid > * {
+    background: var(--bg);
+  }
+  .mp-grid > :nth-child(-n + 5) {
+    background: var(--bg-soft);
+  }
+  .mp-phase {
+    justify-self: start;
+    align-self: center;
+    margin: 6px 8px;
+    font-size: 0.56rem;
+  }
+  .mp-lever {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--brand-ink);
+    background: var(--bg-soft);
+  }
+  /* The bars already carry the lever color, so the dot only appears when the
+     narrow layout hides the lever names and it becomes the row's only label. */
+  .mp-lever .vcm-dot {
+    display: none;
+    width: 7px;
+    height: 7px;
+  }
+  .mp-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 6px;
+  }
+  .mp-bar {
+    display: block;
+    height: 9px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--c) 30%, var(--bg));
+  }
+  .mp-bar.is-built {
+    background: color-mix(in srgb, var(--brand-cyan-ink) 30%, var(--bg));
+    box-shadow: 0 0 0 1px var(--brand-cyan-ink);
+  }
+
+  /* Narrow frames: drop the lever names to dots so the cells keep their room. */
+  @container mp (max-width: 26rem) {
+    .mp-grid {
+      grid-template-columns: 1.4rem repeat(4, minmax(0, 1fr));
+    }
+    .mp-lever .vcm-dot {
+      display: block;
+    }
+    .mp-lever {
+      font-size: 0;
+      justify-content: center;
+      padding: 6px 0;
+    }
+    .mp-phase {
+      margin: 6px 4px;
+      font-size: 0.5rem;
+      padding: 1px 4px;
+    }
+  }
+</style>

@@ -1,0 +1,12 @@
+---
+// An external link. Opens in the same tab (same-family navigation).
+// Rest props are spread so a parent's scoped styles reach the anchor.
+interface Props {
+  href: string;
+  class?: string;
+  [key: string]: unknown;
+}
+const { href, class: className, ...rest } = Astro.props;
+---
+
+<a href={href} class:list={['ext-link', className]} {...rest}><slot /></a>

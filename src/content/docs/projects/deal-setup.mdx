@@ -1,0 +1,75 @@
+---
+title: Setting up a deal project
+description: Stand up a siloed project for one live engagement, with NDA checks before upload and archiving on close, using Project Titan as the worked example.
+section: Projects
+order: 4
+---
+
+import PromptCard from '../../../components/PromptCard.astro';
+import Steps from '../../../components/Steps.astro';
+import Step from '../../../components/Step.astro';
+import ClaudeWindow from '../../../components/claude-ui/ClaudeWindow.astro';
+import ClaudeProject from '../../../components/claude-ui/ClaudeProject.astro';
+import FileChip from '../../../components/claude-ui/FileChip.astro';
+
+This is where a real management presentation, live financials, and NDA-bound diligence actually go. A deal project is the workbench layer from the [two-layer system](/projects/two-layer-system): one project, one live engagement, fully siloed. This page walks through standing one up properly, using **Project Titan**, a US field-service software target in a client engagement, as the worked example.
+
+## Standing up the Titan project
+
+<Steps>
+  <Step title="Create one dedicated project for the opportunity">
+    Open <strong>Projects</strong>, choose <strong>New project</strong>, and name it for this opportunity alone, for example <strong>Project Titan</strong>. One opportunity, one project. Never reuse an existing deal project for a different target, and never combine two opportunities in one place.
+  </Step>
+  <Step title="Confirm what is permitted before anything goes in">
+    Before uploading a single file, check that the opportunity's NDA and [Firm Name]'s data-handling policy allow it into Claude; if a document is not cleared, it does not go in.
+  </Step>
+  <Step title="Add the cleared data room files">
+    Upload the permitted materials into the project's knowledge base: the management presentation, the financials, the data pack, and any cleared diligence documents. These become the shared context every chat in the project can read, so you never re-attach them.
+  </Step>
+  <Step title="Write deal-specific instructions">
+    Set custom instructions tailored to this opportunity: name the target, state the stage you are at, and reinforce the rules that matter on live material (cite sources, do not invent figures, flag gaps). The template below is a ready-to-paste starting point.
+  </Step>
+  <Step title="Keep everything inside this project">
+    All Titan work happens in the Titan project. Do not paste Titan figures into a chat in another project, and do not pull another opportunity's files in here. The silo only holds if you respect it in daily use.
+  </Step>
+  <Step title="Archive or delete on close">
+    When the opportunity closes, completes, or dies, archive or delete the project according to [Firm Name]'s retention policy. A deal project is temporary by design.
+  </Step>
+</Steps>
+
+## What the finished project looks like
+
+<ClaudeWindow caption="A deal project is siloed: one opportunity's cleared data room, and nothing from any other." url="claude.ai · Projects">
+  <ClaudeProject name="Project Titan" kind="Deal project" capacity="22% of knowledge used" capacityPct={22}>
+    <p slot="instructions">You are assisting [Team Name] on Project Titan, a US field-service software target, at the diligence stage. Work only from the files in this project. Cite the source document and page for every figure, never invent numbers, and flag anything the data room leaves unclear.</p>
+    <FileChip name="Project_Titan_Mgmt_Presentation.pdf" kind="pdf" />
+    <FileChip name="Titan_financials.xlsx" kind="xls" />
+    <FileChip name="Data_pack.pdf" kind="pdf" />
+    <FileChip name="Titan_diligence_QA.docx" kind="doc" />
+  </ClaudeProject>
+</ClaudeWindow>
+
+## The custom instructions to start with
+
+Paste this into the Titan project's custom instructions and adapt the target name and stage to your opportunity.
+
+<PromptCard title="Custom instructions for a deal project">
+You are assisting [Team Name] working on Project Titan, a US field-service software target. We are currently at the diligence stage.
+
+Scope:
+- Work only from the documents in this project's knowledge base. These are the cleared data room materials for Titan.
+- Do not bring in outside assumptions or figures from any other opportunity.
+
+How to answer:
+- Cite the source document (and page where visible) for every figure or claim you report.
+- Never invent or estimate a number. If something is not in the data room, say so explicitly.
+- Flag clearly anything the materials leave unclear, contradict, or omit.
+- When you draft (report sections, question lists, summaries), keep the tone precise and client-ready.
+
+Reminder: this is live, confidential material. Treat every figure as something I will verify against the source before it reaches the client.
+</PromptCard>
+
+## After the opportunity closes
+
+A deal project is not meant to outlive its opportunity. Once Titan closes or is passed on, archive or delete the project in line with [Firm Name]'s retention policy. The methodology you used lives safely in your reusable function projects, so nothing of lasting value is lost by clearing down the workbench.
+

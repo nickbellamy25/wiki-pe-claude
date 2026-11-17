@@ -1,0 +1,236 @@
+---
+import type { Track } from '../config/nav';
+import { TRACKS, navForTrack, walkSections } from '../config/nav';
+import { existingDocSlugs } from '../utils/existingDocs';
+import { withBase } from '../utils/withBase';
+import { brand } from '../config/brand';
+
+const existing = await existingDocSlugs();
+
+// The footer mirrors the wiki's two tracks, derived from the same nav registry
+// the sidebar reads. Naming the sections here by hand is what let a renamed
+// section silently vanish from the site map, so nothing is named twice.
+//
+// Nested sections are included on purpose: the footer is where a section the
+// sidebar folds away stays reachable.
+//
+// A section holding a single page is labelled with that page's title, because
+// a section name pointing at one lone page tells the reader less than the page
+// name does.
+function trackLinks(track: Track) {
+  return [...walkSections(navForTrack(track))].flatMap((section) => {
+    const first = section.items[0];
+    if (!first) return [];
+    return [
+      {
+        title: section.items.length === 1 ? first.title : section.label,
+        slug: first.slug,
+      },
+    ];
+  });
+}
+
+const coreSections = trackLinks('core');
+const advancedSections = trackLinks('advanced');
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <p class="footer-title">Claude for Private Equity</p>
+      <p class="footer-tagline">From the basics to confident daily use.</p>
+    </div>
+
+    <nav class="footer-col footer-track" aria-label={TRACKS.core.name}>
+      <p class="footer-heading">{TRACKS.core.name}</p>
+      <ul>
+        {
+          coreSections.map((item) =>
+            existing.has(item.slug) ? (
+              <li><a href={withBase(item.slug)}>{item.title}</a></li>
+            ) : (
+              <li><span class="footer-soon">{item.title}<em>soon</em></span></li>
+            )
+          )
+        }
+      </ul>
+    </nav>
+
+    <nav class="footer-col footer-track" aria-label={TRACKS.advanced.name}>
+      <p class="footer-heading">{TRACKS.advanced.name}</p>
+      <ul>
+        {
+          advancedSections.map((item) =>
+            existing.has(item.slug) ? (
+              <li><a href={withBase(item.slug)}>{item.title}</a></li>
+            ) : (
+              <li><span class="footer-soon">{item.title}<em>soon</em></span></li>
+            )
+          )
+        }
+      </ul>
+    </nav>
+  </div>
+
+  <div class="footer-bar">
+    <div class="container footer-bar-inner">
+      <div class="footer-notice">
+        <p class="footer-classification">INTERNAL USE ONLY</p>
+        <p>
+          © {year} {brand.copyrightNotice}
+          {
+            brand.copyrightLink && (
+              <>
+                {' '}
+                <a class="footer-ext" href={brand.copyrightLink.href} rel="noopener">{brand.copyrightLink.text}</a>.
+              </>
+            )
+          }
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-24);
+    border-top: 1px solid var(--chrome-line);
+    background: var(--chrome-bg);
+  }
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: var(--space-12);
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-12);
+  }
+
+  .footer-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--on-dark);
+  }
+  .footer-tagline {
+    margin: 2px 0 0;
+    font-size: 0.9rem;
+    color: var(--on-dark-muted);
+    max-width: 30ch;
+    line-height: 1.5;
+  }
+
+  .footer-heading {
+    margin: 0 0 var(--space-3);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--on-dark-muted);
+  }
+  .footer-subheading {
+    margin: var(--space-5) 0 var(--space-3);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--on-dark-muted);
+  }
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .footer-col a {
+    color: var(--on-dark);
+    font-size: 0.92rem;
+    transition: color 0.15s ease;
+  }
+  .footer-col a:hover {
+    color: var(--brand-on-dark);
+    text-decoration: none;
+  }
+  .footer-soon {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--on-dark-muted);
+    font-size: 0.92rem;
+    cursor: default;
+  }
+  .footer-soon em {
+    font-style: normal;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--on-dark-muted);
+    background: var(--chrome-elevated);
+    border: 1px solid var(--chrome-line);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+
+  .footer-bar {
+    border-top: 1px solid var(--chrome-line);
+  }
+  .footer-bar-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-4);
+    font-size: 0.84rem;
+    color: var(--on-dark-muted);
+  }
+  .footer-ext {
+    color: var(--on-dark);
+  }
+  .footer-ext:hover {
+    color: var(--brand-on-dark);
+  }
+  .footer-notice p {
+    margin: 0;
+    max-width: 90ch;
+    line-height: 1.55;
+  }
+  .footer-classification {
+    margin-bottom: var(--space-2) !important;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--on-dark);
+  }
+  .footer-notice a {
+    text-decoration: underline;
+  }
+  .footer-bar-muted {
+    color: var(--on-dark-muted);
+  }
+
+  @media (max-width: 760px) {
+    .footer-inner {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-8);
+    }
+    .footer-brand {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 460px) {
+    .footer-inner {
+      grid-template-columns: 1fr;
+    }
+    .footer-bar-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-1);
+    }
+  }
+</style>

@@ -1,0 +1,114 @@
+---
+// Strategic summary for the full AI Value Creation Matrix
+// page, passed into VcmGrid's slot so it renders inside the .vcm root.
+// Indentation is 2 spaces deeper than typical because of that nesting.
+---
+
+  <!-- Thesis -->
+  <div class="vcm-thesis">
+    <div class="vcm-thesis-head">
+      <p class="vcm-thesis-eyebrow">Strategic Summary</p>
+      <h3 class="vcm-thesis-title">The AI Hold Thesis</h3>
+    </div>
+    <div class="vcm-thesis-body">
+      <div class="vcm-thesis-col">
+        <p>
+          <strong>AI is not a new value creation lever.</strong> Every use case in this inventory existed
+          before large language models, before ML-powered pricing engines, before conversational KPI
+          collection. What AI changes is the cost and speed of execution across every lever that already
+          matters. SG&A analysis that required a 4-week analyst project now takes 48 hours. Churn risk that
+          was invisible until renewal is surfaced 90 days early. Pricing discounts that were "relationship
+          decisions" are now quantifiably correlated with win rates. The frame is not "add AI to the value
+          creation plan", it is "which parts of the plan can AI compress, sharpen, or make continuous."
+        </p>
+        <p>
+          <strong>The right support differs by fund tier.</strong> Mid-market funds often have no portfolio ops
+          team to accelerate. They have lean investment teams managing portfolio companies directly, with quarterly
+          board reviews as their primary governance mechanism, so AI-enabled operating support can stand in for a
+          function the fund cannot afford to build internally. PortCo Pulse is the
+          infrastructure layer for this model: low deployment cost, immediate visibility, designed for CFOs
+          and controllers who are not data scientists.
+        </p>
+      </div>
+      <div class="vcm-thesis-col">
+        <p>
+          <strong>For large-cap funds, the pitch is depth and cross-portfolio pattern recognition</strong>
+          that internal teams cannot replicate. A fund's internal portfolio ops director can run standard
+          monitoring. The relevant support includes sector benchmark databases, cross-portfolio spend analytics, and specialist
+          AI tooling (pricing, predictive maintenance, demand forecasting) that require implementation
+          capability beyond what most internal teams sustain across a full portfolio. The use cases that
+          clear the bar here are the ones requiring deep technical implementation, not the ones available off
+          the shelf.
+        </p>
+        <p>
+          <strong>PortCo Pulse operationalizes the prerequisite.</strong> Every high-value AI application in
+          this inventory depends on clean, current, structured data from the portco. Pricing analytics
+          requires transaction history. Churn prediction requires customer health data. Org analysis requires
+          HRIS exports. None of this happens without a monitoring discipline that enforces regular data
+          collection and flags gaps. PortCo Pulse is not the end state, it is the data foundation that makes
+          every other use case viable, and the entry point that generates the ongoing data flow from which
+          higher-value advisory work originates.
+        </p>
+        <p>
+          <strong>Implementation specificity matters most.</strong> Whatever the fund tier, the support that lands
+          leads with concrete implementation detail rather than framework decks: which data is needed, who
+          maintains it, and which decision it improves.
+        </p>
+      </div>
+    </div>
+  </div>
+
+<style>
+  /* ---- Thesis ---- */
+  .vcm-thesis {
+    margin-top: var(--space-8);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .vcm-thesis-head {
+    background: var(--chrome-bg);
+    padding: var(--space-4) var(--space-6);
+  }
+  .vcm-thesis-eyebrow {
+    margin: 0 0 2px;
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brand-cyan);
+  }
+  .vcm-thesis-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--on-dark);
+  }
+  .vcm-thesis-body {
+    padding: var(--space-6);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    background: var(--bg-soft);
+  }
+  .vcm-thesis-col p {
+    margin: 0 0 var(--space-4);
+    font-size: 0.86rem;
+    line-height: 1.7;
+    color: var(--ink-muted);
+  }
+  .vcm-thesis-col p:last-child {
+    margin-bottom: 0;
+  }
+  .vcm-thesis-col strong {
+    color: var(--brand-ink);
+    font-weight: 650;
+  }
+
+  @media (max-width: 720px) {
+    .vcm-thesis-body {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

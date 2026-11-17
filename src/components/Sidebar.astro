@@ -1,0 +1,336 @@
+---
+import type { NavSection, Track } from '../config/nav';
+import { TRACKS, sectionHoldsSlug, trackPositions } from '../config/nav';
+import { existingDocSlugs } from '../utils/existingDocs';
+import { withBase } from '../utils/withBase';
+
+interface Props {
+  currentSlug: string;
+  sections: NavSection[];
+  track: Track;
+}
+const { currentSlug, sections, track } = Astro.props;
+
+const existing = await existingDocSlugs();
+
+// Shared position labels from nav.ts (numbered spine + lettered optional items).
+const positions = trackPositions(track);
+
+// The switcher points at the opposite track's landing page.
+const otherTrack: Track = track === 'core' ? 'advanced' : 'core';
+const current = TRACKS[track];
+const other = TRACKS[otherTrack];
+---
+
+<nav class="sidebar" aria-label="Wiki navigation">
+  <div class="sidebar-scroll">
+    <div class="track-switcher">
+      <a class="track-home" href={withBase('/')}>
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" aria-hidden="true">
+          <path d="M4 11l8-7 8 7M6 9.5V20h12V9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span>Home</span>
+      </a>
+      <p class="track-name">{current.name}</p>
+      <a class="track-switch" href={withBase('/' + other.homeSlug)}>
+        <span>Switch to {other.name}</span>
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+    </div>
+    {
+      (() => {
+        // The link markup has a single definition, reused by every section at
+        // every depth, so how a section is wrapped never changes how it reads.
+        const itemList = (section: NavSection) => (
+          <ul class="nav-list">
+            {section.items.map((item) => {
+              const isActive = item.slug === currentSlug;
+              const exists = existing.has(item.slug);
+              const posLabel = positions.get(item.slug)?.label ?? '';
+              return (
+                <li>
+                  {exists ? (
+                    <a
+                      href={withBase(item.slug)}
+                      class:list={['nav-link', { active: isActive }]}
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      <span class="nav-num" aria-hidden="true">{posLabel}</span>
+                      <span class="nav-text">{item.title}</span>
+                    </a>
+                  ) : (
+                    <span class="nav-link nav-soon" title="Coming soon">
+                      <span class="nav-num" aria-hidden="true">{posLabel}</span>
+                      <span class="nav-text">{item.title}</span>
+                      <span class="soon-tag">soon</span>
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        );
+
+        // Recursive, so a sub-section is rendered by exactly the same code as a
+        // top-level one and inherits its behaviour for free.
+        const renderSection = (section: NavSection, depth: number) => {
+          const classes = [
+            'nav-section',
+            { optional: section.optional, nested: depth > 0 },
+          ];
+          const body = (
+            <>
+              {itemList(section)}
+              {section.children?.map((child) => renderSection(child, depth + 1))}
+            </>
+          );
+
+          // A folded section still opens when the reader is inside it, or
+          // inside anything nested under it, so the current page is never
+          // hidden from its own navigation.
+          if (section.collapsible) {
+            const holdsCurrent = sectionHoldsSlug(section, currentSlug);
+            return (
+              <details class:list={classes} open={!section.startClosed || holdsCurrent}>
+                <summary class="nav-label nav-summary">
+                  <span>{section.label}</span>
+                  <svg class="nav-chevron" viewBox="0 0 24 24" width="11" height="11" fill="none" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </summary>
+                {body}
+              </details>
+            );
+          }
+
+          return (
+            <div class:list={classes}>
+              <p class="nav-label">{section.label}</p>
+              {body}
+            </div>
+          );
+        };
+
+        return sections.map((section) => renderSection(section, 0));
+      })()
+    }
+  </div>
+</nav>
+
+<style>
+  .sidebar {
+    width: var(--sidebar-w);
+    flex: 0 0 var(--sidebar-w);
+    height: 100%;
+  }
+  .sidebar-scroll {
+    position: sticky;
+    top: var(--header-h);
+    max-height: calc(100vh - var(--header-h));
+    overflow-y: auto;
+    padding: var(--space-8) var(--space-6) var(--space-12) 0;
+    scrollbar-width: thin;
+  }
+
+  .nav-section + .nav-section {
+    margin-top: var(--space-6);
+  }
+  .nav-section.optional {
+    margin-top: var(--space-8);
+    border-top: 1px solid var(--line);
+    padding-top: var(--space-6);
+  }
+  /* Consecutive folded sections read as one zone, so only the first of a run
+     carries the dividing rule. */
+  .nav-section.optional + .nav-section.optional {
+    margin-top: var(--space-2);
+    border-top: none;
+    padding-top: 0;
+  }
+  /* A nested section sits inside its parent's disclosure, so it carries no
+     divider of its own; the indent is what signals the relationship. */
+  .nav-section.nested,
+  .nav-section.optional.nested {
+    margin-top: var(--space-4);
+    border-top: none;
+    padding-top: 0;
+    padding-left: var(--space-3);
+  }
+  .nav-section.nested .nav-label {
+    font-size: 0.66rem;
+  }
+  .nav-section.optional .nav-label {
+    color: var(--ink-subtle);
+  }
+  .nav-section.optional .nav-num {
+    font-variant-numeric: normal;
+    font-style: italic;
+  }
+
+  /* Track switcher: identifies the current track (claude.ai vs Claude Code),
+     links home, and offers a subtle jump to the other track. Sits above the
+     section list, separated by a hairline rule. */
+  .track-switcher {
+    margin-bottom: var(--space-6);
+    padding: 0 var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--line);
+  }
+  .track-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    transition: color 0.15s ease;
+  }
+  .track-home:hover {
+    color: var(--brand-ink);
+    text-decoration: none;
+  }
+  .track-name {
+    margin: var(--space-3) 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .track-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--brand-ink);
+    transition: gap 0.15s ease;
+  }
+  .track-switch:hover {
+    text-decoration: none;
+    gap: 9px;
+  }
+  .nav-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin: 0 0 var(--space-2);
+    padding-left: var(--space-3);
+  }
+  /* Collapsible sections: the label becomes the control. Native <details>
+     keeps it keyboard-accessible and working without JavaScript. */
+  .nav-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: color 0.15s ease;
+  }
+  .nav-summary::-webkit-details-marker {
+    display: none;
+  }
+  .nav-summary:hover {
+    color: var(--brand-ink);
+  }
+  .nav-summary:focus-visible {
+    outline: 2px solid var(--brand-purple);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+  .nav-chevron {
+    flex: 0 0 auto;
+    margin-right: var(--space-3);
+    color: var(--ink-subtle);
+    transition: transform 0.18s ease;
+  }
+  details[open] > .nav-summary .nav-chevron {
+    transform: rotate(180deg);
+  }
+  .nav-summary:hover .nav-chevron {
+    color: var(--brand-ink);
+  }
+
+  .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-list li {
+    margin: 0;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--ink-muted);
+    font-size: 0.92rem;
+    line-height: 1.4;
+    transition:
+      color 0.15s ease,
+      background 0.15s ease;
+  }
+  a.nav-link:hover {
+    color: var(--ink);
+    background: var(--bg-soft);
+    text-decoration: none;
+  }
+  .nav-num {
+    flex: 0 0 auto;
+    min-width: 18px;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    color: var(--ink-subtle);
+    transition: color 0.15s ease;
+  }
+  .nav-link.active {
+    color: var(--brand-ink);
+    font-weight: 650;
+    background: var(--brand-tint);
+  }
+  .nav-link.active .nav-num {
+    color: var(--brand-ink);
+  }
+  a.nav-link:hover .nav-num {
+    color: var(--ink-muted);
+  }
+
+  .nav-soon {
+    color: var(--ink-subtle);
+    cursor: default;
+  }
+  .nav-soon .nav-num {
+    color: var(--ink-subtle);
+  }
+  .soon-tag {
+    margin-left: auto;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-subtle);
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+
+  @media (max-width: 1080px) {
+    .sidebar {
+      display: none;
+    }
+  }
+</style>

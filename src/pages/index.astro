@@ -1,0 +1,196 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { withBase } from '../utils/withBase';
+import TwoPathsDiagram from '../components/diagrams/TwoPathsDiagram.astro';
+---
+
+<BaseLayout title="Home">
+  <Header />
+
+  <main id="main" class="home">
+    <!-- ===================== HERO ===================== -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <!-- Left: the pitch -->
+        <div class="hero-copy">
+          <h1 id="hero-title" class="hero-title" data-hero="2">
+            Claude for Private Equity
+          </h1>
+          <p class="hero-sub" data-hero="3">
+            One Claude, two ways to work: claude.ai for everyday questions, and Claude Code for advanced, hands-on work in your files.
+          </p>
+          <div class="hero-actions" data-hero="4">
+            <a href={withBase('/welcome')} class="btn btn-primary">Start with claude.ai</a>
+            <a href={withBase('/claude-code/welcome')} class="btn btn-secondary">Explore Claude Code</a>
+          </div>
+        </div>
+
+        <!-- Right: the signature element, a diagram of the two ways to work -->
+        <div class="hero-demo" data-hero="6">
+          <div class="hero-diagram">
+            <TwoPathsDiagram />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* ---------- Shared institutional accents ---------- */
+  .mono-meta {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+  }
+
+  /* ---------- HERO ---------- */
+  /* The footer keeps a gap above it for doc pages; here the hero already ends the
+     page, so that gap would be an empty white band. */
+  .home + :global(.site-footer) {
+    margin-top: 0;
+  }
+  .hero {
+    position: relative;
+    min-height: calc(100svh - var(--header-h));
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: relative;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: var(--space-12);
+    align-items: center;
+    padding-top: var(--space-24);
+    padding-bottom: var(--space-24);
+  }
+  .hero-copy {
+    max-width: 36rem;
+  }
+  .hero-eyebrow {
+    margin: 0 0 var(--space-6);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.6;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--brand-ink);
+  }
+  .hero-eyebrow-link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .hero-eyebrow-link:hover {
+    color: var(--brand-ink-strong);
+  }
+  .hero-title {
+    margin: 0 0 var(--space-6);
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 1.6rem + 2.8vw, 3.7rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .hero-sub {
+    margin: 0 0 var(--space-8);
+    font-size: clamp(1.05rem, 1rem + 0.35vw, 1.22rem);
+    line-height: 1.62;
+    color: var(--ink-muted);
+    max-width: 40ch;
+  }
+  /* Both hero buttons are filled with the accent color. */
+  .hero-actions :global(.btn-secondary) {
+    background: var(--brand-ink);
+    color: var(--on-dark);
+    border-color: transparent;
+    box-shadow: var(--shadow-sm);
+  }
+  .hero-actions :global(.btn-secondary:hover) {
+    background: var(--brand-ink-strong);
+    border-color: transparent;
+    box-shadow: var(--shadow-md);
+  }
+  .hero-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  /* ---- Signature diagram card ---- */
+  .hero-demo {
+    position: relative;
+  }
+  .hero-diagram {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-md);
+    background: var(--bg);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 960px) {
+    .hero {
+      min-height: 0;
+      display: block;
+    }
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-12);
+      padding-top: var(--space-16);
+      padding-bottom: var(--space-16);
+    }
+    .hero-copy {
+      max-width: none;
+    }
+  }
+
+
+</style>
+
+<script>
+  import '../scripts/motion.ts';
+
+  // Scoped, restrained build-in for the conversation card. Respects reduced motion.
+  // The global motion system handles [data-hero] and [data-reveal]; this adds the
+  // chat bubbles staggering in after the hero settles.
+  (() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const bubbles = Array.from(document.querySelectorAll<HTMLElement>('[data-chat]'));
+    if (!bubbles.length) return;
+
+    if (reduce) {
+      bubbles.forEach((el) => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+      return;
+    }
+
+    bubbles
+      .sort((a, b) => Number(a.dataset.chat) - Number(b.dataset.chat))
+      .forEach((el, i) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(14px)';
+        el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
+        window.setTimeout(() => {
+          el.style.opacity = '1';
+          el.style.transform = 'none';
+        }, 620 + i * 220);
+      });
+  })();
+</script>
